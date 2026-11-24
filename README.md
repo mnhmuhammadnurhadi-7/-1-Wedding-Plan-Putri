@@ -14,14 +14,14 @@ Aplikasi perencana pernikahan modern berbasis **Next.js 16 (App Router)**, **Rea
 9. **Dokumen Persyaratan (`/dokumen`)**: Tracking 34 dokumen KUA & sipil, checklist ketersediaan, berkas wajib/kondisional, dan lampiran berkas dari modul lain.
 10. **Catatan Tindak Lanjut (`/catatan`)**: CRUD catatan ide, hasil musyawarah keluarga, topik pembahasan, dan indikator tanggal terlambat.
 11. **Pengaturan Sistem (`/pengaturan`)**: Konfigurasi nama mempelai, tanggal acara, target dana, ekspor cadangan JSON, dan info sesi login.
-12. **Autentikasi & Login (`/login`)**: Role-based access (Owner, Editor, Viewer) dengan proteksi session cookie HMAC-SHA256.
+12. **Autentikasi & Login (`/login`)**: Akun email dan kata sandi dengan peran Super Admin, Admin baca saja, dan Tamu undangan. Super Admin mengelola akun dari Pengaturan; Tamu hanya dapat membuka `/undangan`.
 
 ## Prasyarat
 - Node.js 18+ (atau Node 20+)
 - MySQL Server (lokal atau cloud/VPS)
 
-## Konfigurasi Database (.env.local)
-Salin `.env.example` ke `.env.local` dan sesuaikan koneksi database MySQL:
+## Konfigurasi (.env.local)
+Salin `.env.example` ke `.env.local`, isi koneksi MySQL, buat secret acak minimal 32 karakter, dan tetapkan kata sandi awal Super Admin minimal 12 karakter:
 ```env
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -29,12 +29,15 @@ DB_USER=root
 DB_PASSWORD=
 DB_NAME=wedding-plan
 DB_SSL=false
-WP_EDIT_PASSCODE=
-WP_SESSION_SECRET=ganti-dengan-string-acak-panjang
+WP_SESSION_SECRET=secret-acak-minimal-32-karakter
+WP_SUPERADMIN_EMAIL=merried@gmail.com
+WP_SUPERADMIN_PASSWORD=kata-sandi-awal-minimal-12-karakter
 ```
 
+Jaga `.env.local` dan kata sandi akun tetap privat. Admin dapat melihat seluruh dashboard, tetapi semua API tulis mensyaratkan sesi Super Admin. Tamu hanya menerima data nama dan jadwal yang ditampilkan pada undangan.
+
 ## Inisialisasi & Seeding Data
-1. Buat tabel database (`planner_documents` dan `planner_uploads`):
+1. Buat tabel database (`planner_documents`, `planner_uploads`, dan `planner_users`) serta akun Super Admin awal:
    ```bash
    npm run db:init
    ```
@@ -42,6 +45,7 @@ WP_SESSION_SECRET=ganti-dengan-string-acak-panjang
    ```bash
    npm run db:seed
    ```
+3. Setelah masuk sebagai Super Admin, buka **Pengaturan → Kelola Akun** untuk menambahkan akun kedua dan akun Admin/Tamu. Dari panel ini Super Admin dapat mengubah nama, email, peran, dan kata sandi, menonaktifkan akun, atau menghapusnya secara permanen. Kata sandi minimal 12 karakter; Super Admin terakhir tidak dapat dihapus atau diturunkan perannya.
 
 ## Menjalankan Aplikasi
 - **Development**:

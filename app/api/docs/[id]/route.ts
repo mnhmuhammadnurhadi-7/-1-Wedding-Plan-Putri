@@ -54,7 +54,7 @@ export async function POST(request: Request, context: RouteContext) {
   if (!isDocId(id)) {
     return badRequest();
   }
-  if (!isAuthorized(request)) {
+  if (!(await isAuthorized(request))) {
     return forbidden();
   }
 
@@ -95,7 +95,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (!isDocId(id)) {
     return badRequest();
   }
-  if (!isAuthorized(request)) {
+  if (!(await isAuthorized(request))) {
     return forbidden();
   }
 

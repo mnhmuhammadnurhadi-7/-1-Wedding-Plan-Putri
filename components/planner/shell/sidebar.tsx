@@ -54,17 +54,17 @@ export function Sidebar() {
         </div>
       </nav>
       <div className="side-foot">
-        <button
+        {auth.session?.role === "superadmin" && <button
           type="button"
           className="btn sm"
           onClick={() => void exportData()}
         >
           <Icon name="download" /> Export Data
-        </button>
+        </button>}
         <Link href="/login" className="btn sm">
           <Icon name="users" />{" "}
           {auth.session?.role
-            ? `${auth.session.role}`
+            ? `${auth.session.name} · ${auth.session.role}`
             : "Masuk / Ganti Akun"}
         </Link>
         <div className="sync">

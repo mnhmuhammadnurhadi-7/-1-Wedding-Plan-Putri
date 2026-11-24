@@ -1,158 +1,79 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import type { RowDataPacket } from "mysql2";
+import { pool } from "@/lib/db";
 
-export const editCookieName = "wp_edit";
 export const sessionCookieName = "wp_session";
-
-export type UserRole = "owner" | "editor" | "viewer";
-
+export type UserRole = "superadmin" | "admin" | "guest";
 export type UserSession = {
+  id: number;
+  email: string;
   name: string;
   role: UserRole;
-  canWrite: boolean;
   issuedAt: number;
 };
 
-export function getPasscode() {
-  return (process.env.WP_EDIT_PASSCODE || "").trim();
-}
-
 function secret() {
-  return (
-    process.env.WP_SESSION_SECRET ||
-    getPasscode() ||
-    "wp-local-development-session"
-  );
+  const value = process.env.WP_SESSION_SECRET || "";
+  if (value.length < 32) throw new Error("WP_SESSION_SECRET harus berisi minimal 32 karakter.");
+  return value;
 }
 
 function safeEqual(a: string, b: string) {
   const left = Buffer.from(a);
   const right = Buffer.from(b);
-  if (left.length !== right.length) {
-    return false;
-  }
-  return timingSafeEqual(left, right);
+  return left.length === right.length && timingSafeEqual(left, right);
 }
 
 export function cookieValue(cookie: string | null, name: string) {
-  if (!cookie) {
-    return "";
-  }
-
-  for (const part of cookie.split(";")) {
+  for (const part of (cookie || "").split(";")) {
     const index = part.indexOf("=");
-    if (index < 0) {
-      continue;
-    }
-    if (part.slice(0, index).trim() === name) {
-      try {
-        return decodeURIComponent(part.slice(index + 1).trim());
-      } catch {
-        return "";
-      }
+    if (index >= 0 && part.slice(0, index).trim() === name) {
+      try { return decodeURIComponent(part.slice(index + 1).trim()); } catch { return ""; }
     }
   }
-
   return "";
 }
 
-export function editRequired() {
-  return getPasscode().length > 0;
-}
-
-export function issueEditToken() {
-  return createHmac("sha256", secret())
-    .update(`wp-edit:${getPasscode()}`)
-    .digest("base64url");
-}
-
-export function createSessionToken(session: UserSession): string {
+export function createSessionToken(session: UserSession) {
   const payload = Buffer.from(JSON.stringify(session)).toString("base64url");
-  const signature = createHmac("sha256", secret())
-    .update(payload)
-    .digest("base64url");
+  const signature = createHmac("sha256", secret()).update(payload).digest("base64url");
   return `${payload}.${signature}`;
 }
 
 export function verifySessionToken(token: string): UserSession | null {
-  if (!token || !token.includes(".")) {
-    return null;
-  }
-
   const [payload, signature] = token.split(".");
-  if (!payload || !signature) {
-    return null;
-  }
-
-  const expectedSignature = createHmac("sha256", secret())
-    .update(payload)
-    .digest("base64url");
-
-  if (!safeEqual(signature, expectedSignature)) {
-    return null;
-  }
-
+  if (!payload || !signature) return null;
+  let expected: string;
+  try { expected = createHmac("sha256", secret()).update(payload).digest("base64url"); } catch { return null; }
+  if (!safeEqual(signature, expected)) return null;
   try {
-    const data = JSON.parse(
-      Buffer.from(payload, "base64url").toString("utf8"),
-    ) as UserSession;
-
-    // Optional expiry (30 days)
-    if (Date.now() - data.issuedAt > 30 * 24 * 60 * 60 * 1000) {
-      return null;
-    }
-
-    return data;
-  } catch {
-    return null;
-  }
+    const session = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as UserSession;
+    if (!session.id || !session.email || !["superadmin", "admin", "guest"].includes(session.role)) return null;
+    if (!Number.isFinite(session.issuedAt) || Date.now() - session.issuedAt > 30 * 86400000) return null;
+    return session;
+  } catch { return null; }
 }
 
-export function getSessionFromRequest(request: Request): UserSession | null {
-  const cookie = cookieValue(request.headers.get("cookie"), sessionCookieName);
-  if (cookie) {
-    const session = verifySessionToken(cookie);
-    if (session) return session;
-  }
-
-  // Fallback: check legacy wp_edit cookie
-  const editCookie = cookieValue(request.headers.get("cookie"), editCookieName);
-  if (editCookie && safeEqual(editCookie, issueEditToken())) {
-    return {
-      name: "Antariksa & Sofiya",
-      role: "owner",
-      canWrite: true,
-      issuedAt: Date.now(),
-    };
-  }
-
-  // If no edit passcode is required, default to owner
-  if (!editRequired()) {
-    return {
-      name: "Tamu / Pengguna Lokal",
-      role: "owner",
-      canWrite: true,
-      issuedAt: Date.now(),
-    };
-  }
-
-  return null;
+export function getSessionFromRequest(request: Request) {
+  return verifySessionToken(cookieValue(request.headers.get("cookie"), sessionCookieName));
 }
 
-export function isAuthorized(request: Request) {
-  if (!editRequired()) {
-    return true;
-  }
+export async function getActiveSession(request: Request) {
+  const tokenSession = getSessionFromRequest(request);
+  if (!tokenSession) return null;
+  const [rows] = await pool.execute<(RowDataPacket & { id: number; email: string; name: string; role: UserRole })[]>(
+    "SELECT id,email,name,role FROM planner_users WHERE id=? AND active=TRUE LIMIT 1",
+    [tokenSession.id],
+  );
+  const user = rows[0];
+  return user ? { ...tokenSession, id: user.id, email: user.email, name: user.name, role: user.role } : null;
+}
 
-  const supplied = request.headers.get("x-wp-passcode")?.trim() || "";
-  if (supplied && safeEqual(supplied, getPasscode())) {
-    return true;
-  }
+export async function isAuthorized(request: Request) {
+  return (await getActiveSession(request))?.role === "superadmin";
+}
 
-  const session = getSessionFromRequest(request);
-  if (session && session.canWrite) {
-    return true;
-  }
-
-  const cookie = cookieValue(request.headers.get("cookie"), editCookieName);
-  return cookie.length > 0 && safeEqual(cookie, issueEditToken());
+export async function canReadPlanner(request: Request) {
+  const role = (await getActiveSession(request))?.role;
+  return role === "superadmin" || role === "admin";
 }

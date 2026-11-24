@@ -1,6 +1,7 @@
 import { connection, NextResponse } from "next/server";
 import type { RowDataPacket } from "mysql2";
 import { isoDate, parseJsonColumn, pool } from "@/lib/db";
+import { canReadPlanner } from "@/lib/auth";
 import type { StoredDocument } from "@/lib/planner";
 
 type DocumentRow = RowDataPacket & {
@@ -9,8 +10,11 @@ type DocumentRow = RowDataPacket & {
   updated_at: Date | string;
 };
 
-export async function GET() {
+export async function GET(request: Request) {
   await connection();
+  if (!(await canReadPlanner(request))) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
 
   try {
     const [rows] = await pool.query<DocumentRow[]>(

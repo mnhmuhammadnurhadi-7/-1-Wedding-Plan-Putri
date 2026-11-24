@@ -1,7 +1,5 @@
 import type { DocRow } from "./types";
 
-const PASS_KEY = "wp-edit-passcode";
-
 export class ApiError extends Error {
   code: string;
   status: number;
@@ -10,22 +8,6 @@ export class ApiError extends Error {
     super(message);
     this.status = status;
     this.code = status === 401 || status === 403 ? "forbidden" : `http_${status}`;
-  }
-}
-
-export function getPasscode() {
-  try {
-    return localStorage.getItem(PASS_KEY) || "";
-  } catch {
-    return "";
-  }
-}
-
-export function setPasscode(value: string) {
-  try {
-    localStorage.setItem(PASS_KEY, value);
-  } catch {
-    /* storage unavailable */
   }
 }
 
@@ -41,8 +23,6 @@ async function request<T>(
     Accept: "application/json",
     ...options.headers,
   };
-  const passcode = getPasscode();
-  if (passcode) headers["x-wp-passcode"] = passcode;
 
   let body = options.body;
   if (body && !(body instanceof FormData)) {
@@ -98,31 +78,23 @@ export async function mergeDocument(id: string, patch: unknown) {
 export async function checkAuth() {
   try {
     return await request<{
-      required: boolean;
       ok: boolean;
-      session?: { name: string; role: string; canWrite: boolean };
+      session?: { id: number; email: string; name: string; role: string };
     }>("/api/auth");
   } catch (error) {
-    if (error instanceof ApiError && error.code === "forbidden") {
-      return { required: true, ok: false };
-    }
     throw error;
   }
 }
 
 export type LoginPayload = {
-  role: "owner" | "editor" | "viewer";
-  name?: string;
-  passcode?: string;
+  email: string;
+  password: string;
 };
 
 export async function login(payload: LoginPayload) {
-  if (payload.passcode) {
-    setPasscode(payload.passcode);
-  }
   return request<{
     ok: boolean;
-    session: { name: string; role: string; canWrite: boolean };
+    session: { id: number; email: string; name: string; role: string };
   }>("/api/auth", {
     method: "POST",
     body: payload,
@@ -130,7 +102,6 @@ export async function login(payload: LoginPayload) {
 }
 
 export async function logout() {
-  setPasscode("");
   return request<{ ok: boolean }>("/api/auth", {
     method: "DELETE",
   });

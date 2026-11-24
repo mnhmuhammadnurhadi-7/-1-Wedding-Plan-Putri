@@ -3954,3 +3954,203 @@ details>summary {
 .bn-s3h em {
   font-size: 14px
 }
+
+/* Mobile fit and gentle interaction polish */
+#view > :first-child {
+  animation: page-enter .42s cubic-bezier(.2, .7, .25, 1) both;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card,
+.btn,
+.tab,
+.moregrid a,
+.bn-s3,
+.bn-row {
+  transition: transform .18s ease, box-shadow .2s ease, background-color .18s ease, border-color .18s ease;
+}
+
+.card,
+.grid,
+.stack,
+.head,
+.sec,
+.kv,
+.row,
+.bn,
+.bn-in,
+.sv-page {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.big,
+.amt,
+.kv b,
+.sumcard .big,
+.tint .big,
+.sv-big,
+.sv-mini b,
+.sv-la,
+.sv-total b {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:not(.soft):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(140, 83, 98, .09);
+  }
+
+  .bn-s3:hover,
+  .bn-row:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.btn:active,
+.tab:active,
+.bn-hb:active,
+.cb:active {
+  transform: scale(.97);
+}
+
+.seg {
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.seg button {
+  min-height: 40px;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+  }
+
+  main {
+    padding-top: 14px;
+  }
+
+  .card {
+    border-radius: 17px;
+    padding: 16px;
+  }
+
+  .grid {
+    gap: 12px;
+  }
+
+  .head {
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .head h1 {
+    font-size: clamp(28px, 8vw, 36px);
+    overflow-wrap: anywhere;
+  }
+
+  .head .acts2 {
+    width: 100%;
+  }
+
+  .head .acts2 > .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .sumcard .big,
+  .tint .big {
+    font-size: clamp(13px, 3.8vw, 16px);
+    line-height: 1.35;
+    letter-spacing: -.035em;
+  }
+
+  .row {
+    flex-wrap: wrap;
+    gap: 8px 10px;
+  }
+
+  .row .main {
+    flex: 1 1 calc(100% - 42px);
+  }
+
+  .row .amt {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .kv {
+    align-items: flex-start;
+    gap: 6px 10px;
+  }
+
+  .kv span {
+    flex: 1 1 42%;
+  }
+
+  .kv b {
+    flex: 0 1 auto;
+    text-align: right;
+  }
+
+  .btn.sm {
+    min-height: 40px;
+  }
+
+  .sel,
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+  }
+
+  .sv-c1 .sv-big {
+    font-size: clamp(17px, 6.5cqi, 30px);
+    line-height: 1.18;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .sv-c1 .sv-mini b,
+  .sv-la,
+  .bn-la {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .bn-li {
+    column-gap: 6px;
+  }
+
+  .tab {
+    min-height: 52px;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #view > :first-child {
+    animation: none;
+  }
+
+  .card,
+  .btn,
+  .tab,
+  .moregrid a,
+  .bn-s3,
+  .bn-row {
+    transition: none !important;
+  }
+}

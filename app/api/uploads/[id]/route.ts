@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import type { RowDataPacket } from "mysql2";
-import { isAuthorized } from "@/lib/auth";
+import { canReadPlanner } from "@/lib/auth";
 import { pool } from "@/lib/db";
 
 type UploadRow = RowDataPacket & {
@@ -16,7 +16,7 @@ type RouteContext = {
 export async function GET(request: Request, context: RouteContext) {
   await connection();
 
-  if (!isAuthorized(request)) {
+  if (!(await canReadPlanner(request))) {
     return new Response("Forbidden", { status: 403 });
   }
 

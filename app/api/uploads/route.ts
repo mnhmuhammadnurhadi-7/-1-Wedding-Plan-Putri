@@ -8,7 +8,7 @@ const maxUploadBytes = 12 * 1024 * 1024;
 export async function POST(request: Request) {
   await connection();
 
-  if (!isAuthorized(request)) {
+  if (!(await isAuthorized(request))) {
     return NextResponse.json({ error: "forbidden" }, { status: 401 });
   }
 

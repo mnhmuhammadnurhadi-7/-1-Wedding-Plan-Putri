@@ -3,9 +3,15 @@
 interface VendorFiltersProps {
   query: string;
   onQueryChange: (q: string) => void;
+  categories: string[];
+  activeCategory: string;
+  onCategoryChange: (value: string) => void;
+  statuses: string[];
+  activeStatus: string;
+  onStatusChange: (value: string) => void;
 }
 
-export function VendorFilters({ query, onQueryChange }: VendorFiltersProps) {
+export function VendorFilters({ query, onQueryChange, categories, activeCategory, onCategoryChange, statuses, activeStatus, onStatusChange }: VendorFiltersProps) {
   return (
     <div className="tools">
       <div className="search">
@@ -19,6 +25,14 @@ export function VendorFilters({ query, onQueryChange }: VendorFiltersProps) {
           onChange={(e) => onQueryChange(e.target.value)}
         />
       </div>
+      <select aria-label="Filter kategori vendor" value={activeCategory} onChange={(e) => onCategoryChange(e.target.value)}>
+        <option value="Semua">Semua kategori</option>
+        {categories.map((category) => <option key={category} value={category}>{category}</option>)}
+      </select>
+      <select aria-label="Filter status vendor" value={activeStatus} onChange={(e) => onStatusChange(e.target.value)}>
+        <option value="Semua">Semua status</option>
+        {statuses.map((status) => <option key={status} value={status}>{status}</option>)}
+      </select>
     </div>
   );
 }

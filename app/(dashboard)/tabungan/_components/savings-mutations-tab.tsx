@@ -65,6 +65,7 @@ export function SavingsMutationsTab({
             ["Semua", "Semua"],
             [brideName, brideName],
             [groomName, groomName],
+            ["Bersama", "Bersama"],
           ].map(([v, l]) => (
             <button
               key={v}

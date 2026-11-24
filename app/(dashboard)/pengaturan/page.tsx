@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePlanner } from "@/components/planner/data/planner-store";
+import { UserManagement } from "@/components/modules/auth/user-management";
 
 export default function PengaturanPage() {
   const router = useRouter();
@@ -61,6 +62,7 @@ export default function PengaturanPage() {
       </div>
 
       <div className="grid g2" style={{ alignItems: "start" }}>
+        {auth.session?.role === "superadmin" && <UserManagement />}
         {/* Profil & Target Pernikahan */}
         <section className="card">
           <h3 style={{ marginBottom: "16px", fontSize: "20px" }}>
@@ -186,7 +188,7 @@ export default function PengaturanPage() {
             </button>
           </section>
 
-          <section className="card">
+          {canWrite && <section className="card">
             <h3 style={{ marginBottom: "8px", fontSize: "20px" }}>Cadangan Data (Backup)</h3>
             <p className="note" style={{ marginBottom: "16px" }}>
               Unduh seluruh data perencanaan pernikahan dalam format file JSON.
@@ -198,7 +200,7 @@ export default function PengaturanPage() {
             >
               Ekspor Backup JSON
             </button>
-          </section>
+          </section>}
         </div>
       </div>
     </div>
