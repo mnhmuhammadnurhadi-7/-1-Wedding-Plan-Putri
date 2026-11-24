@@ -41,10 +41,16 @@ export function BudgetPlanTab({
 
   const hit = (item: BudgetItem) => {
     if (!q) return true;
+    const transactions = expenses.filter((expense) => expense.budgetId === item.id);
     return (
       (item.name || "").toLowerCase().includes(q) ||
       (item.cat || "").toLowerCase().includes(q) ||
-      (item.note || "").toLowerCase().includes(q)
+      (item.note || "").toLowerCase().includes(q) ||
+      transactions.some((expense) => {
+        const vendorName = getVendorName ? getVendorName(expense.vendorId) : "";
+        return [expense.desc, expense.note, vendorName, expense.payer, expense.method]
+          .some((value) => (value || "").toLowerCase().includes(q));
+      })
     );
   };
 
@@ -86,14 +92,11 @@ export function BudgetPlanTab({
     );
   };
 
-  let renderedAnyCategory = false;
-
   const catSections = categories.map((cat) => {
     const all = budgetItems.filter((b) => b.cat === cat);
     const xs = all.filter(hit);
     if (q && !xs.length) return null;
 
-    renderedAnyCategory = true;
     const t = all.reduce((sum, b) => sum + (Number(b.qty) || 1) * (Number(b.price) || 0), 0);
     const a = all.reduce((sum, b) => sum + (actB[b.id] || 0), 0);
     const over = a > t && t > 0;
@@ -227,6 +230,7 @@ export function BudgetPlanTab({
         (e.desc || "").toLowerCase().includes(q) ||
         (e.note || "").toLowerCase().includes(q))
   );
+  const renderedAnyCategory = catSections.some(Boolean);
 
   return (
     <>

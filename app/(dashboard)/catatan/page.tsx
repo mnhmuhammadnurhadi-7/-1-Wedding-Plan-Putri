@@ -2,13 +2,12 @@
 
 import { usePlanner } from "@/components/planner/data/planner-store";
 import { noteType } from "@/components/planner/data/calculations";
+import { NTYPES } from "@/components/planner/data/constants";
 import { pct } from "@/components/planner/data/helpers";
 import { Tile } from "@/components/planner/ui/tile";
 import type { Note } from "@/components/planner/data/types";
 import { NotesFilters } from "./_components/notes-filters";
 import { NotesGridCards } from "./_components/notes-grid-cards";
-
-const NTYPES = ["Ide", "Keputusan", "Perlu Dibahas"];
 
 export default function CatatanPage() {
   const { data, ui, setFilter, canWrite, openForm, putItem } = usePlanner();

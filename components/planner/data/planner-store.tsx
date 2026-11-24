@@ -35,9 +35,8 @@ import type {
 } from "./types";
 
 type AuthState = {
-  required: boolean;
   ok: boolean;
-  session?: { name: string; role: string; canWrite: boolean };
+  session?: { id: number; email: string; name: string; role: string };
 };
 
 type PlannerContextValue = {
@@ -147,8 +146,8 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [ui, setUi] = useState<FilterState>(initialUi);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
-  const [auth, setAuth] = useState<AuthState>({ required: false, ok: true });
-  const [canWrite, setCanWrite] = useState(true);
+  const [auth, setAuth] = useState<AuthState>({ ok: false });
+  const [canWrite, setCanWrite] = useState(false);
   const [syncPending, setSyncPending] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [toastMessage, setToastMessage] = useState("");
@@ -221,10 +220,10 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       .then((result) => {
         if (cancelled) return;
         setAuth(result);
-        setCanWrite(!result.required || result.ok);
+        setCanWrite(result.session?.role === "superadmin");
       })
       .catch(() => {
-        if (!cancelled) setCanWrite(true);
+        if (!cancelled) setCanWrite(false);
       });
     return () => {
       cancelled = true;

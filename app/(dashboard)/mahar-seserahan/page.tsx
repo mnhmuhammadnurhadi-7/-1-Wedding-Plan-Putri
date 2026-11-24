@@ -14,7 +14,7 @@ export default function MaharSeserahanPage() {
 
   const items = all.filter((g) => {
     if (f.kind !== "Semua" && g.kind !== f.kind) return false;
-    if (f.st !== "Semua" && g.status !== f.st) return false;
+    if (f.st !== "Semua" && (g.status || "Belum Dibeli") !== f.st) return false;
     if (q) {
       const match =
         (g.name || "").toLowerCase().includes(q) ||
@@ -114,8 +114,8 @@ export default function MaharSeserahanPage() {
         />
         <Tile
           label="Belum dibeli"
-          value={all.filter((g) => g.status === "Belum Dibeli").length}
-          sub={`${all.filter((g) => g.status === "Belum Dibeli" && g.pri === "Tinggi").length} prioritas tinggi`}
+          value={all.filter((g) => (g.status || "Belum Dibeli") === "Belum Dibeli").length}
+          sub={`${all.filter((g) => (g.status || "Belum Dibeli") === "Belum Dibeli" && g.pri === "Tinggi").length} prioritas tinggi`}
         />
       </div>
 

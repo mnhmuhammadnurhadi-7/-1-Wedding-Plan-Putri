@@ -63,9 +63,10 @@ export const confOf = (guest: Guest) =>
 
 export const noteType = (note: PlannerItem) => {
   const text = String(note.type || "");
+  if (text === "Keputusan") return "Keputusan Keluarga";
   if (text) return text;
   if (/^ide\b/i.test(String(note.note || ""))) return "Ide";
-  if (note.status === "Selesai") return "Keputusan";
+  if (note.status === "Selesai") return "Keputusan Keluarga";
   return "Perlu Dibahas";
 };
 
@@ -74,7 +75,9 @@ export const exSt = (expense: Expense) =>
     ? "Belum Dibayar"
     : expense.status === "DP"
       ? "DP"
-      : "Lunas";
+      : expense.status === "Lunas"
+        ? "Lunas"
+        : "Belum Dibayar";
 
 export const paidOf = (expense: Expense) => {
   const amount = Number(expense.amount) || 0;

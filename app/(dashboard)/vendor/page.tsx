@@ -12,12 +12,16 @@ export default function VendorPage() {
 
   const q = (ui.vd.q || "").toLowerCase().trim();
   const vendorList: Vendor[] = Object.values(data.vendors || {});
+  const categories = Array.from(new Set(vendorList.map((v) => v.cat).filter(Boolean))) as string[];
+  const statuses = ["Calon", "Negosiasi", "Booked", "Lunas", "Batal"];
 
   const getPaidAmount = (id: string) => {
     return calc.paidV[id] || 0;
   };
 
   const filteredVendors = vendorList.filter((v) => {
+    if (ui.vd.cat && ui.vd.cat !== "Semua" && v.cat !== ui.vd.cat) return false;
+    if (ui.vd.st && ui.vd.st !== "Semua" && vStatus(v, getPaidAmount(v.id)) !== ui.vd.st) return false;
     if (!q) return true;
     return (
       (v.name || "").toLowerCase().includes(q) ||
@@ -72,6 +76,12 @@ export default function VendorPage() {
       <VendorFilters
         query={ui.vd.q || ""}
         onQueryChange={(qVal) => setFilter("vd", "q", qVal)}
+        categories={categories}
+        activeCategory={ui.vd.cat || "Semua"}
+        onCategoryChange={(value) => setFilter("vd", "cat", value)}
+        statuses={statuses}
+        activeStatus={ui.vd.st || "Semua"}
+        onStatusChange={(value) => setFilter("vd", "st", value)}
       />
 
       {/* Grid of vendors */}
