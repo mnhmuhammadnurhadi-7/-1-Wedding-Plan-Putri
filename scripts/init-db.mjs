@@ -1,15 +1,9 @@
 import mysql from "mysql2/promise";
+import { dbOptions } from "./db-options.mjs";
 
 const database = process.env.DB_NAME || "wedding-plan";
 
-const connection = await mysql.createConnection({
-  host: process.env.DB_HOST || "127.0.0.1",
-  port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database,
-  charset: "utf8mb4",
-});
+const connection = await mysql.createConnection(dbOptions());
 
 try {
   await connection.query(`

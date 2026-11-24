@@ -10,8 +10,10 @@ function numberEnv(name: string, fallback: number) {
 }
 
 function createPool() {
-  const ssl =
-    process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : undefined;
+  const ca = process.env.DB_SSL_CA?.replace(/\\n/g, "\n");
+  const ssl = process.env.DB_SSL === "true"
+    ? { rejectUnauthorized: true, ...(ca ? { ca } : {}) }
+    : undefined;
 
   return mysql.createPool({
     host: process.env.DB_HOST || "127.0.0.1",

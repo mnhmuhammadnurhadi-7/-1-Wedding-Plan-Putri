@@ -3,7 +3,7 @@ import { connection, NextResponse } from "next/server";
 import { isAuthorized } from "@/lib/auth";
 import { pool } from "@/lib/db";
 
-const maxUploadBytes = 12 * 1024 * 1024;
+const maxUploadBytes = 5 * 1024 * 1024;
 
 export async function POST(request: Request) {
   await connection();
