@@ -31,16 +31,10 @@ export default function BerandaPage() {
     <div className="bn">
       {/* Mobile Header */}
       <header className="bn-mh">
-        <button className="bn-hb" type="button" aria-label="Buka menu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-            <path d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
-        </button>
         <div className="bn-logo">
           <b>{groom} &amp; {bride}</b>
           <span>Wedding planner</span>
         </div>
-        <span className="bn-hs" />
       </header>
 
       {/* Sapaan dan hitung mundur */}
