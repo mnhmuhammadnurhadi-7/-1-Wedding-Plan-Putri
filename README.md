@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wedding Planner Antariksa & Sofiya — Fullstack Next.js
 
-## Getting Started
+Aplikasi perencana pernikahan modern berbasis **Next.js 16 (App Router)**, **React 19**, **TypeScript**, dan **MySQL**.
 
-First, run the development server:
+## Fitur Utama & Modul (Full CRUD)
+1. **Beranda (`/beranda`)**: Dashboard eksekutif, live countdown detik, ringkasan tabungan vs estimasi, progress per PIC, dan 4 tombol Akses Cepat.
+2. **Checklist (`/checklist`)**: CRUD tugas persiapan (150 tugas bawaan), filter status, PIC, kategori, dan template bawaan.
+3. **Estimasi Pengeluaran (`/anggaran`)**: CRUD kategori anggaran, item estimasi, dan pencatatan riwayat realisasi pembayaran (DP/Lunas).
+4. **Savings & Dana Nikah (`/tabungan`)**: Portofolio tabungan, alokasi instrumen investasi (Deposito, SBN, Reksadana, Saham), riwayat mutasi kas, rekap kontribusi pasangan, pencatatan pencairan dana (*anti-double counting*).
+5. **Mahar & Seserahan (`/mahar` atau `/mahar-seserahan`)**: CRUD daftar barang mahar & seserahan, status pembelian, dan estimasi biaya (terpisah dari anggaran utama).
+6. **Acara & Rundown (`/acara`)**: CRUD jadwal agenda Akad & Resepsi, waktu, lokasi, PIC lapangan, dan template rundown.
+7. **Vendor (`/vendor`)**: CRUD vendor, rincian paket, kontak PIC, harga, DP, dan integrasi bukti kontrak/pembayaran.
+8. **Tamu Undangan (`/tamu`)**: CRUD daftar tamu, kelompok/pihak (Antariksa/Sofiya), RSVP, jumlah pax konfirmasi hadir, dan nomor meja.
+9. **Dokumen Persyaratan (`/dokumen`)**: Tracking 34 dokumen KUA & sipil, checklist ketersediaan, berkas wajib/kondisional, dan lampiran berkas dari modul lain.
+10. **Catatan Tindak Lanjut (`/catatan`)**: CRUD catatan ide, hasil musyawarah keluarga, topik pembahasan, dan indikator tanggal terlambat.
+11. **Pengaturan Sistem (`/pengaturan`)**: Konfigurasi nama mempelai, tanggal acara, target dana, ekspor cadangan JSON, dan info sesi login.
+12. **Autentikasi & Login (`/login`)**: Role-based access (Owner, Editor, Viewer) dengan proteksi session cookie HMAC-SHA256.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Prasyarat
+- Node.js 18+ (atau Node 20+)
+- MySQL Server (lokal atau cloud/VPS)
+
+## Konfigurasi Database (.env.local)
+Salin `.env.example` ke `.env.local` dan sesuaikan koneksi database MySQL:
+```env
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=wedding-plan
+DB_SSL=false
+WP_EDIT_PASSCODE=
+WP_SESSION_SECRET=ganti-dengan-string-acak-panjang
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Inisialisasi & Seeding Data
+1. Buat tabel database (`planner_documents` dan `planner_uploads`):
+   ```bash
+   npm run db:init
+   ```
+2. Isi data awal dari snapshot JSON (150 checklist, 82 tamu, 47 seserahan, dll):
+   ```bash
+   npm run db:seed
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Menjalankan Aplikasi
+- **Development**:
+  ```bash
+  npm run dev
+  ```
+  Buka [http://localhost:3000](http://localhost:3000) di browser.
+- **Build Produksi**:
+  ```bash
+  npm run build
+  npm run start
+  ```
+- **Lint & Typecheck**:
+  ```bash
+  npm run lint
+  ```
+# -1-Wedding-Plan-Putri
