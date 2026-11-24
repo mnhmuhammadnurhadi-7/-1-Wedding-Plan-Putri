@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import mysql from "mysql2/promise";
+import { dbOptions } from "./db-options.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const exportPath =
@@ -25,14 +26,7 @@ if (!payload || payload.format !== "wp-export" || !payload.data) {
   process.exit(1);
 }
 
-const connection = await mysql.createConnection({
-  host: process.env.DB_HOST || "127.0.0.1",
-  port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database,
-  charset: "utf8mb4",
-});
+const connection = await mysql.createConnection(dbOptions());
 
 try {
   await connection.beginTransaction();

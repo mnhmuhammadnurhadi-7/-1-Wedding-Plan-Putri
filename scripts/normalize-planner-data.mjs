@@ -1,18 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import mysql from "mysql2/promise";
+import { dbOptions } from "./db-options.mjs";
 
 const backupDir = path.resolve(process.cwd(), "db-backups");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const database = process.env.DB_NAME || "wedding-plan";
-const connection = await mysql.createConnection({
-  host: process.env.DB_HOST || "127.0.0.1",
-  port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database,
-  charset: "utf8mb4",
-});
+const connection = await mysql.createConnection(dbOptions());
 
 const eventByCategory = {
   "Dokumen KUA": "Akad",
