@@ -2425,8 +2425,8 @@ details>summary {
 }
 
 .bn-mh {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
   align-items: center;
   margin: -4px 0 0
 }

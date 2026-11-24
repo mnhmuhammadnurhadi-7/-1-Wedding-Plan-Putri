@@ -8,9 +8,10 @@ import type { Task } from "@/components/planner/data/types";
 import { CountdownBanner } from "./_components/countdown-banner";
 import { ExecutiveStats } from "./_components/executive-stats";
 import { PriorityChecklist } from "./_components/priority-checklist";
+import { MoreSheet } from "@/components/planner/forms/more-sheet";
 
 export default function BerandaPage() {
-  const { data, calc, fund, canWrite, putItem, openForm } = usePlanner();
+  const { data, calc, fund, canWrite, putItem, openForm, openSheet, closeSheet } = usePlanner();
 
   const groom = nameA(data);
   const bride = nameB(data);
@@ -31,10 +32,16 @@ export default function BerandaPage() {
     <div className="bn">
       {/* Mobile Header */}
       <header className="bn-mh">
+        <button className="bn-hb" type="button" aria-label="Buka menu" onClick={() => openSheet(<MoreSheet onClose={closeSheet} />)}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
         <div className="bn-logo">
           <b>{groom} &amp; {bride}</b>
           <span>Wedding planner</span>
         </div>
+        <span className="bn-hs" />
       </header>
 
       {/* Sapaan dan hitung mundur */}
