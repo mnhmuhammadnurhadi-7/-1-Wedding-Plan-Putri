@@ -12,7 +12,14 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Supplied single-file UI engine, kept verbatim for visual parity.
+    "public/planner/**",
   ]),
+  {
+    rules: {
+      "@next/next/no-page-custom-font": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

@@ -1,0 +1,15 @@
+function vDokumen(){
+  const c=calc(),all=L('docs'),f=UI.dk,stages=[...new Set([...all.map(d=>d.stage)])],ada=all.filter(d=>d.have).length;
+  const items=all.filter(d=>(f.stage==='Semua'||d.stage===f.stage)&&(f.who==='Semua'||d.who===f.who)&&hit(f.q,d.name,d.desc,d.note,d.stage));
+  const wajib=all.filter(d=>!d.have&&d.req==='Ya').length;
+  const rel=[...c.ven.filter(v=>v.contractUrl).map(v=>['Kontrak vendor',v.name,v.contractUrl]),...c.exp.filter(e=>e.proof).map(e=>['Bukti pembayaran',e.desc+' · '+fmt(e.amount),e.proof])];
+  return head('Dokumen','Persyaratan administrasi dan arsip berkas',addBtn('addDoc','Tambah dokumen'))+
+  `<div class="grid g4" style="margin-bottom:16px">${tile('Total',all.length)}${tile('Sudah ada',ada,'',pct(ada,all.length),'ok')}${tile('Belum',all.length-ada)}${tile('Wajib belum ada',wajib)}</div>
+  <div class="chips">${['Semua',...stages].map(s=>`<button class="chip" aria-pressed="${f.stage===s}" data-act="dkStage" data-v="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+  <div class="tools">${searchBox('dk','Cari dokumen')}<div class="seg">${[['Semua','Semua'],['Perempuan',nameB()],['Laki-laki',nameA()],['Keduanya','Keduanya']].map(([v,l])=>`<button aria-pressed="${f.who===v}" data-act="dkWho" data-v="${v}">${esc(l)}</button>`).join('')}</div></div>
+  ${stages.filter(s=>items.some(d=>d.stage===s)).map(s=>`<section class="card" style="margin-bottom:14px"><div class="grp" style="cursor:default"><h3>${esc(s)}</h3><small>${all.filter(d=>d.stage===s&&d.have).length}/${all.filter(d=>d.stage===s).length}</small></div><div class="list">${items.filter(d=>d.stage===s).map(d=>`<div class="row click ${d.have?'done':''}" data-act="editDoc" data-id="${d.id}"><button class="cb" role="checkbox" aria-checked="${d.have}" aria-label="Sudah ada" data-act="toggleDoc" data-id="${d.id}">${ic('tick',2.4)}</button><div class="main"><div class="t">${esc(d.name)}</div><div class="m"><span class="pill ${d.req==='Ya'?'acc':''}">${d.req==='Ya'?'Wajib':'Kondisional'}</span><span>${esc(whoLabel(d.who))}</span>${d.qty?`<span>${esc(d.qty)}</span>`:''}${d.file?`<a class="lk" href="${esc(d.file)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${ic('link')}Buka berkas</a>`:''}</div>${d.desc||d.note?`<div class="note" style="margin-top:3px">${esc([d.desc,d.note].filter(Boolean).join(' · '))}</div>`:''}</div></div>`).join('')}</div></section>`).join('')||emptyBox('Tidak ada dokumen','Ubah filter atau tambahkan dokumen.',canWrite?`<br><button class="btn pri" data-act="addDoc">Tambah dokumen</button>`:'')}
+  <div class="sec"><h2>Berkas dari modul lain</h2><small>Kontrak vendor dan bukti pembayaran</small></div>
+  <section class="card"><div class="list">${rel.map(([k,n,u])=>`<div class="row"><div class="main"><div class="t">${esc(n)}</div><div class="m"><span>${k}</span></div></div>${fileLink(u,'Buka')}</div>`).join('')||`<div class="empty"><b>Belum ada berkas</b>Lampirkan kontrak di Vendor atau bukti transaksi di Anggaran, dan berkasnya muncul di sini.</div>`}</div></section>`;
+}
+
+/* ---- catatan ---- */

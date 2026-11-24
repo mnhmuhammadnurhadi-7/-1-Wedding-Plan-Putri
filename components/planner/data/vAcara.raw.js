@@ -1,0 +1,14 @@
+function vAcara(){
+  const f=UI.ac,all=L('events'),items=all.filter(e=>e.kind===f.kind).sort((a,b)=>(mins(a.start)??9999)-(mins(b.start)??9999)||(a.o||0)-(b.o||0));
+  const s=S(),done=items.filter(e=>e.status==='Selesai').length;
+  const first=items.find(e=>e.start),last=[...items].reverse().find(e=>e.end||e.start);
+  const span=first&&last?durTxt(first.start,last.end||last.start):'';
+  const tl=items.length?`<ol class="tl">${items.map(e=>`<li class="${e.status==='Selesai'?'done':''}"><div class="tm">${esc(e.start||'--:--')}<small>${e.end?'s/d '+esc(e.end):''}${durTxt(e.start,e.end)?'<br>'+durTxt(e.start,e.end):''}</small></div><span class="pt"></span>
+   <div class="card ${e.status==='Selesai'?'done':''}"><div style="display:flex;gap:12px;align-items:flex-start"><button class="cb" role="checkbox" aria-checked="${e.status==='Selesai'}" aria-label="Tandai selesai" data-act="toggleEvent" data-id="${e.id}" style="margin-top:2px">${ic('tick',2.4)}</button><div class="main click" data-act="editEvent" data-id="${e.id}" style="flex:1;min-width:0;cursor:pointer"><div class="t" style="font-weight:600;font-size:16px">${esc(e.name)}</div><div class="m note" style="display:flex;gap:4px 12px;flex-wrap:wrap;margin-top:4px">${e.pic?`<span>PIC: ${esc(e.pic)}</span>`:''}${e.loc?`<span>${esc(e.loc)}</span>`:''}<span class="pill ${e.status==='Selesai'?'ok':''}">${esc(e.status||'Belum Dimulai')}</span></div>${e.note?`<div class="note" style="margin-top:6px">${esc(e.note)}</div>`:''}</div></div></div></li>`).join('')}</ol>`
+   :emptyBox(`Belum ada agenda ${f.kind}`,'Susun urutan acara satu per satu, atau mulai dari template lalu ubah sesuai rencana.',canWrite?`<br><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn pri" data-act="addEvent">Tambah agenda</button><button class="btn" data-act="rdTpl">Pakai template</button></div>`:'');
+  return head('Acara & Rundown',s.weddingDate?dFmt(s.weddingDate,{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'Susunan acara hari-H',(canWrite&&items.length?`<button class="btn" data-act="rdTpl">${ic('list')} Template</button>`:'')+addBtn('addEvent','Tambah agenda'))+
+  `<div class="seg" style="margin-bottom:16px">${['Akad Nikah','Resepsi'].map(k=>`<button aria-pressed="${f.kind===k}" data-act="acKind" data-v="${k}">${k}</button>`).join('')}</div>
+  <div class="grid g3" style="margin-bottom:22px">${tile('Agenda',items.length,`${done} selesai`,pct(done,items.length),'ok')}${tile('Mulai',first?esc(first.start):'–',first?esc(first.name):'')}${tile('Rentang waktu',span||'–',last&&last.end?'sampai '+esc(last.end):'')}</div>${tl}`;
+}
+
+/* ---- vendor ---- */
